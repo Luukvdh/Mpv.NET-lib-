@@ -374,6 +374,7 @@ namespace Mpv.NET.API
 			if (error != MpvError.Success)
 				throw MpvAPIException.FromError(error, functions);
 		}
+  		public Mpv GetInstanceMpv() {return this};
 
 		public int UnobserveProperty(ulong registeredReplyUserData)
 		{
