@@ -1,5 +1,6 @@
 ﻿using Mpv.NET.API.Interop;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -209,6 +210,7 @@ namespace Mpv.NET.API
 				if (error != MpvError.Success)
 					throw MpvAPIException.FromError(error, Functions);
 			}
+			catch (MpvAPIException e) { Debug.WriteLine(e.Message); Debug.WriteLine(e.InnerException?.Message ?? "");  }
 			finally
 			{
 				MpvMarshal.FreeComPtrArray(argsPtrs);
