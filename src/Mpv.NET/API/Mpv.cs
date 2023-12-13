@@ -236,6 +236,7 @@ namespace Mpv.NET.API
 				if (error != MpvError.Success)
 					throw MpvAPIException.FromError(error, Functions);
 			}
+			catch (MpvAPIException ex) { Debug.WriteLine(ex.Message); Debug.WriteLine(ex.StackTrace); Debug.WriteLine(ex.Source); Debug.WriteLine(ex.InnerException?.Message ?? ""); Debug.WriteLine(ex.InnerException?.StackTrace ?? ""); }
 			finally
 			{
 				MpvMarshal.FreeComPtrArray(argsPtrs);
