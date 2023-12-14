@@ -1,9 +1,9 @@
-﻿using Mpv.NET.API.Interop;
+﻿#define FORCE_DEBUG_OUTPUT
+using Mpv.NET.API.Interop;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-
 namespace Mpv.NET.API
 {
 	public partial class Mpv : IDisposable
@@ -48,8 +48,8 @@ namespace Mpv.NET.API
 		private IMpvFunctions functions;
 		private IMpvEventLoop eventLoop;
 		private IntPtr handle;
-
-		private bool disposed = false;
+		private static int c = 0;
+        private bool disposed = false;
 
 		public Mpv(string dllPath)
 		{
@@ -93,7 +93,18 @@ namespace Mpv.NET.API
 
 		private void InitialiseMpv()
 		{
+			c += 1;
 			Handle = Functions.Create();
+			var w1 = Functions.SetOptionString(Handle, "input-ipc-server", $"\\mpvsocket{c}");
+			var w4 = Functions.SetOptionString(Handle, "config", "no");
+			var w5 = Functions.SetOptionString(Handle, "osc", "no");
+			var w6 = Functions.SetOptionString(Handle, "name", "1");
+			var w2 = Functions.LoadConfigFile(Handle, System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mpv","mpv.conf"));
+			var w3 = Functions.LoadConfigFile(Handle, System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mpv","input.conf"));
+#if FORCE_DEBUG_OUTPUT
+            Debug.WriteLine($"options loaded: {w1} {w2} {w3} {w4} {w5} {w6}");
+            Console.WriteLine($"options loaded: {w1} {w2} {w3} {w4} {w5} {w6}");
+#endif
 			if (Handle == IntPtr.Zero)
 				throw new MpvAPIException("Failed to create Mpv context.");
 
@@ -129,9 +140,18 @@ namespace Mpv.NET.API
 
 			var newHandle = Functions.CreateClient(Handle, out string name);
 			if (newHandle == IntPtr.Zero)
+			{
 				throw new MpvAPIException("Failed to create new client.");
-
-			return new Mpv(newHandle, Functions);
+			}
+            Handle = Functions.Create();
+            var w1 = Functions.SetOptionString(newHandle, "input-ipc-server", $"\\\\.\\pipe\\mpvsocket${c}");
+            var w2 = Functions.LoadConfigFile(newHandle, System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mpv", "mpv.conf"));
+            var w3 = Functions.LoadConfigFile(newHandle, System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mpv", "input.conf"));
+#if FORCE_DEBUG_OUTPUT
+            Debug.WriteLine($"options loaded, errors: {w1} {w2} {w3}");
+            Console.WriteLine($"options loaded, errors: {w1} {w2} {w3}");
+#endif
+            return new Mpv(newHandle, Functions);
 		}
 
 		public void LoadConfigFile(string absolutePath)
