@@ -95,7 +95,7 @@ namespace Mpv.NET.API
 		{
 			c += 1;
 			Handle = Functions.Create();
-			var w1 = Functions.SetOptionString(Handle, "input-ipc-server", $"\\mpvsocket{c}");
+			var w1 = Functions.SetOptionString(Handle, "input-ipc-server", $"\\{Environment.GetEnvironmentVariable("MPVPADSOCKET")}{c}");
 			var w4 = Functions.SetOptionString(Handle, "config", "no");
 			var w5 = Functions.SetOptionString(Handle, "osc", "no");
 			var w6 = Functions.SetOptionString(Handle, "name", "1");
