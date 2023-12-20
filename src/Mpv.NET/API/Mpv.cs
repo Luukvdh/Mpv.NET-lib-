@@ -376,7 +376,7 @@ namespace Mpv.NET.API
 
 			var stringPtr = Functions.GetPropertyString(Handle, name);
 			if (stringPtr == IntPtr.Zero)
-				throw new MpvAPIException("Failed to get property string, invalid pointer.");
+				return string.Empty;
 
 			try
 			{
